@@ -1,7 +1,9 @@
 export interface ControllerStatus {
   isHeatingOn: boolean;
-  temperature: number | null;
-  lastUpdated: Date | null;
+  temperatureInside: number | null;
+  lastUpdatedInside: Date | null;
+  temperatureOutside: number | null;
+  lastUpdatedTemperatureOutside: Date | null;
 }
 
 export interface SMSConfig {

@@ -5,8 +5,10 @@ import { smsConfig } from '../config/sms';
 
 export const useHeatingState = () => {
   const [isHeatingOn, setIsHeatingOn] = useState(false);
-  const [temperature, setTemperature] = useState<number | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [temperatureInside, setTemperatureInside] = useState<number | null>(null);
+  const [lastUpdatedInside, setLastUpdatedInside] = useState<Date | null>(null);
+  const [temperatureOutside, setTemperatureOutside] = useState<number | null>(null);
+  const [lastUpdatedTemperatureOutside, setLastUpdatedTemperatureOutside] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -14,8 +16,8 @@ export const useHeatingState = () => {
       const state = await getLatestHeatingState();
       if (state) {
         setIsHeatingOn(state.isHeatingOn);
-        setTemperature(state.temperature);
-        setLastUpdated(new Date(state.updated));
+        setTemperatureInside(state.temperatureInside);
+        setLastUpdatedInside(new Date(state.updated));
       }
     };
     fetchInitialState();
@@ -29,17 +31,17 @@ export const useHeatingState = () => {
       
       await createHeatingState({
         isHeatingOn: !isHeatingOn,
-        temperature,
+        temperatureInside: temperatureInside,
         lastCommand: command,
         lastCommandSuccess: true,
       });
 
       setIsHeatingOn(!isHeatingOn);
-      setLastUpdated(new Date());
+      setLastUpdatedInside(new Date());
     } catch (error) {
       await createHeatingState({
         isHeatingOn,
-        temperature,
+        temperatureInside: temperatureInside,
         lastCommand: isHeatingOn ? smsConfig.commands.turnOff : smsConfig.commands.turnOn,
         lastCommandSuccess: false,
       });
@@ -56,17 +58,17 @@ export const useHeatingState = () => {
       
       await createHeatingState({
         isHeatingOn,
-        temperature: newTemp,
+        temperatureInside: newTemp,
         lastCommand: smsConfig.commands.status,
         lastCommandSuccess: true,
       });
 
-      setTemperature(newTemp);
-      setLastUpdated(new Date());
+      setTemperatureInside(newTemp);
+      setLastUpdatedInside(new Date());
     } catch (error) {
       await createHeatingState({
         isHeatingOn,
-        temperature,
+        temperatureInside: temperatureInside,
         lastCommand: smsConfig.commands.status,
         lastCommandSuccess: false,
       });
@@ -77,8 +79,10 @@ export const useHeatingState = () => {
 
   return {
     isHeatingOn,
-    temperature,
-    lastUpdated,
+    temperatureInside: temperatureInside,
+    lastUpdatedInside: lastUpdatedInside,
+    temperatureOutside: temperatureOutside,
+    lastUpdatedTemperatureOutside: lastUpdatedTemperatureOutside,
     isLoading,
     handleToggle,
     handleRefresh,
