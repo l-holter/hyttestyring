@@ -1,7 +1,5 @@
 import React from 'react';
 import { Power, RefreshCw } from 'lucide-react';
-import { smsConfig } from '../config/sms';
-import { sendSMS } from '../utils/sms';
 
 interface Props {
   isHeatingOn: boolean;
@@ -13,7 +11,7 @@ interface Props {
 export const ControlPanel: React.FC<Props> = ({ isHeatingOn, onToggle, onRefresh, isLoading }) => {
   return (
     <div className="bg-white rounded-lg p-6 shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">Heating Control</h2>
+      <h2 className="text-xl font-semibold mb-4">Temperatur kontroll</h2>
       
       <div className="flex gap-4">
         <button
@@ -26,7 +24,7 @@ export const ControlPanel: React.FC<Props> = ({ isHeatingOn, onToggle, onRefresh
           } disabled:opacity-50 transition-colors`}
         >
           <Power className="w-5 h-5" />
-          {isHeatingOn ? 'Turn Off' : 'Turn On'}
+          {isHeatingOn ? 'Skru av' : 'Skru på'}
         </button>
         
         <button

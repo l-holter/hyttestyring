@@ -16,12 +16,12 @@ export const StatusIndicator: React.FC<Props> = ({ isHeatingOn, lastUpdated }) =
           <AlertCircle className="w-5 h-5 text-gray-400" />
         )}
         <span className="font-medium">
-          System Status: {isHeatingOn ? 'Heating Active' : 'Heating Off'}
+          Status: {isHeatingOn ? 'Varme på' : 'Varme av'}
         </span>
       </div>
       {lastUpdated && (
         <span className="text-sm text-gray-500">
-          Updated: {lastUpdated.toLocaleTimeString()}
+          Oppdatert: {lastUpdated.toLocaleTimeString()}
         </span>
       )}
     </div>
