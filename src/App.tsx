@@ -1,20 +1,47 @@
+import {useEffect, useState} from "react";
 import { TemperatureDisplay } from './components/TemperatureDisplay.tsx';
 import { ControlPanel } from './components/ControlPanel';
 import { StatusIndicator } from './components/StatusIndicator';
 import { Home } from 'lucide-react';
 import { useHeatingState } from './hooks/useHeatingState';
+import { fetchWeatherDataJson } from './hooks/getWeatherData.ts';
+import { locationConfig } from './config/location.ts'
+
+
 
 function App() {
   const {
     isHeatingOn,
     temperatureInside,
     lastUpdatedInside,
-    temperatureOutside,
-    lastUpdatedTemperatureOutside,
     isLoading,
     handleToggle,
     handleRefresh,
   } = useHeatingState();
+
+  const [temperatureOutside, setTemperatureOutside] = useState<number | null>(null);
+  const [lastUpdatedTemperatureOutside, setLastUpdatedTemperatureOutside] = useState<Date | null>(null);
+
+  useEffect(() => {
+    async function fetchOutsideTemperature() {
+      try {
+        const weatherData = await fetchWeatherDataJson(locationConfig.lat, locationConfig.long);
+
+        // Extract the current temperature from the weather data
+        const currentTemperature =
+            weatherData.properties.timeseries[0]?.data.instant.details.air_temperature;
+
+        if (currentTemperature !== undefined) {
+          setTemperatureOutside(currentTemperature);
+          setLastUpdatedTemperatureOutside(new Date());
+        }
+      } catch (error) {
+        console.error('Failed to fetch outside temperature:', error);
+      }
+    }
+
+    fetchOutsideTemperature();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">

@@ -11,7 +11,7 @@ interface Props {
 export const ControlPanel: React.FC<Props> = ({ isHeatingOn, onToggle, onRefresh, isLoading }) => {
   return (
     <div className="bg-white rounded-lg p-6 shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">Temperatur kontroll</h2>
+      <h2 className="text-xl font-semibold mb-4">Temperaturkontroll</h2>
       
       <div className="flex gap-4">
         <button
