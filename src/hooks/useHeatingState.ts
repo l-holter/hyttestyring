@@ -93,13 +93,23 @@ export const useHeatingState = () => {
     };
   }, []);
 
-  const handleToggle = async () => {
+  const handleTurnOn = async () => {
     setIsLoading(true);
     try {
-      const command = sensors.main.isHeatingOn ? smsConfig.commands.turnOff : smsConfig.commands.turnOn;
-      await sendSMS(command);
+      await sendSMS(smsConfig.commands.turnOn);
     } catch (error) {
-      console.error('Error toggling heating:', error);
+      console.error('Error turning heating on:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTurnOff = async () => {
+    setIsLoading(true);
+    try {
+      await sendSMS(smsConfig.commands.turnOff);
+    } catch (error) {
+      console.error('Error turning heating off:', error);
     } finally {
       setIsLoading(false);
     }
@@ -119,7 +129,8 @@ export const useHeatingState = () => {
   return {
     sensors,
     isLoading,
-    handleToggle,
+    handleTurnOn,
+    handleTurnOff,
     handleRefresh
   };
 };

@@ -12,7 +12,8 @@ function App() {
   const {
     sensors,
     isLoading,
-    handleToggle,
+    handleTurnOn,
+    handleTurnOff,
     handleRefresh,
   } = useHeatingState();
 
@@ -73,8 +74,8 @@ function App() {
           />
           
           <ControlPanel
-            isHeatingOn={sensors.main.isHeatingOn}
-            onToggle={handleToggle}
+            turnOff={handleTurnOff}
+            turnOn={handleTurnOn}
             onRefresh={handleRefresh}
             isLoading={isLoading}
           />
