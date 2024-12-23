@@ -1,4 +1,4 @@
-export const sendSMS = async (command: string): Promise<any> => {
+export const sendSMS = async (command: string): Promise<unknown> => {
   try {
     const response = await fetch('http://localhost:3037', {
       method: 'POST',

@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import PocketBase from 'pocketbase';
 import { sendSMS } from '../utils/sms';
 import { smsConfig } from '../config/sms';
-
-export const pb = new PocketBase('http://localhost:8095');
+import { pb } from "../lib/pocketbase.ts";
 
 interface HeatingState {
   id: string;
