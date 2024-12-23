@@ -14,6 +14,7 @@ function App() {
     isLoading,
     handleTurnOn,
     handleTurnOff,
+    handleTemperatureControl,
     handleRefresh,
   } = useHeatingState();
 
@@ -76,6 +77,7 @@ function App() {
           <ControlPanel
             turnOff={handleTurnOff}
             turnOn={handleTurnOn}
+            turnOnTemperatureControl={handleTemperatureControl}
             onRefresh={handleRefresh}
             isLoading={isLoading}
           />

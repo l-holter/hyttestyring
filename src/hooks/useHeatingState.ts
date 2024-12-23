@@ -115,6 +115,25 @@ export const useHeatingState = () => {
     }
   };
 
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const handleTemperatureControl = async () => {
+    setIsLoading(true);
+    try {
+      await sendSMS(smsConfig.commands.temperatureControlStue);
+      await delay(5000);
+      await sendSMS(smsConfig.commands.temperatureControlStue1);
+      await delay(5000);
+      await sendSMS(smsConfig.commands.temperatureControlStue2);
+      await delay(5000);
+      await sendSMS(smsConfig.commands.temperatureControlSov);
+    } catch (error) {
+      console.error('Error turning heating off:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleRefresh = async () => {
     setIsLoading(true);
     try {
@@ -131,6 +150,7 @@ export const useHeatingState = () => {
     isLoading,
     handleTurnOn,
     handleTurnOff,
+    handleTemperatureControl,
     handleRefresh
   };
 };
