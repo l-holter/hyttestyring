@@ -1,50 +1,105 @@
 import { useState, useEffect } from 'react';
-import { HeatingRecord, getLatestHeatingState, createHeatingState } from '../lib/pocketbase';
+import PocketBase from 'pocketbase';
 import { sendSMS } from '../utils/sms';
 import { smsConfig } from '../config/sms';
 
+export const pb = new PocketBase('http://localhost:8095');
+
+interface HeatingState {
+  id: string;
+  temperature: number | null;
+  isHeatingOn: boolean;
+  isFrostProtectionOn: boolean;
+  lastCommand: string;
+  created: string;
+  updated: string;
+}
+
+interface SensorState {
+  temperature: number | null;
+  isHeatingOn: boolean;
+  isFrostProtectionOn: boolean;
+  lastUpdated: Date | null;
+}
+
+const SENSOR_IDS = ['main', 'stua1', 'stua2', 'sov1'] as const;
+
 export const useHeatingState = () => {
-  const [isHeatingOn, setIsHeatingOn] = useState(false);
-  const [temperatureInside, setTemperatureInside] = useState<number | null>(null);
-  const [lastUpdatedInside, setLastUpdatedInside] = useState<Date | null>(null);
-  const [temperatureOutside, setTemperatureOutside] = useState<number | null>(null);
-  const [lastUpdatedTemperatureOutside, setLastUpdatedTemperatureOutside] = useState<Date | null>(null);
+  const [sensors, setSensors] = useState<Record<string, SensorState>>({
+    main: { temperature: null, isHeatingOn: false, isFrostProtectionOn: false, lastUpdated: null },
+    stua1: { temperature: null, isHeatingOn: false, isFrostProtectionOn: false, lastUpdated: null },
+    stua2: { temperature: null, isHeatingOn: false, isFrostProtectionOn: false, lastUpdated: null },
+    sov1: { temperature: null, isHeatingOn: false, isFrostProtectionOn: false, lastUpdated: null }
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchInitialState = async () => {
-      const state = await getLatestHeatingState();
-      if (state) {
-        setIsHeatingOn(state.isHeatingOn);
-        setTemperatureInside(state.temperatureInside);
-        setLastUpdatedInside(new Date(state.updated));
+    let unsubscribe: (() => void) | undefined;
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        const promises = SENSOR_IDS.map(sensorId =>
+          pb.collection('heating_state').getOne<HeatingState>(sensorId)
+        );
+        
+        const records = await Promise.all(promises);
+        
+        if (!isMounted) return;
+
+        records.forEach((record, index) => {
+          const sensorId = SENSOR_IDS[index];
+          setSensors(prev => ({
+            ...prev,
+            [sensorId]: {
+              temperature: record.temperature,
+              isHeatingOn: record.isHeatingOn,
+              isFrostProtectionOn: record.isFrostProtectionOn,
+              lastUpdated: new Date(record.updated)
+            }
+          }));
+        });
+
+        unsubscribe = await pb.collection('heating_state').subscribe('*', (e) => {
+          if (!isMounted) return;
+          
+          if (e.action === 'update' && SENSOR_IDS.includes(e.record.id as typeof SENSOR_IDS[number])) {
+            setSensors(prev => ({
+              ...prev,
+              [e.record.id]: {
+                temperature: e.record.temperature,
+                isHeatingOn: e.record.isHeatingOn,
+                isFrostProtectionOn: e.record.isFrostProtectionOn,
+                lastUpdated: new Date(e.record.updated)
+              }
+            }));
+          }
+        });
+
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Error fetching sensor data:', error.message);
+        }
       }
     };
-    fetchInitialState();
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   const handleToggle = async () => {
     setIsLoading(true);
     try {
-      const command = isHeatingOn ? smsConfig.commands.turnOff : smsConfig.commands.turnOn;
-      await sendSMS(command, smsConfig.phoneNumber);
-      
-      await createHeatingState({
-        isHeatingOn: !isHeatingOn,
-        temperatureInside: temperatureInside,
-        lastCommand: command,
-        lastCommandSuccess: true,
-      });
-
-      setIsHeatingOn(!isHeatingOn);
-      setLastUpdatedInside(new Date());
+      const command = sensors.main.isHeatingOn ? smsConfig.commands.turnOff : smsConfig.commands.turnOn;
+      await sendSMS(command);
     } catch (error) {
-      await createHeatingState({
-        isHeatingOn,
-        temperatureInside: temperatureInside,
-        lastCommand: isHeatingOn ? smsConfig.commands.turnOff : smsConfig.commands.turnOn,
-        lastCommandSuccess: false,
-      });
+      console.error('Error toggling heating:', error);
     } finally {
       setIsLoading(false);
     }
@@ -53,38 +108,18 @@ export const useHeatingState = () => {
   const handleRefresh = async () => {
     setIsLoading(true);
     try {
-      await sendSMS(smsConfig.commands.status, smsConfig.phoneNumber);
-      const newTemp = Math.round(Math.random() * 10 + 15);
-      
-      await createHeatingState({
-        isHeatingOn,
-        temperatureInside: newTemp,
-        lastCommand: smsConfig.commands.status,
-        lastCommandSuccess: true,
-      });
-
-      setTemperatureInside(newTemp);
-      setLastUpdatedInside(new Date());
+      await sendSMS(smsConfig.commands.status);
     } catch (error) {
-      await createHeatingState({
-        isHeatingOn,
-        temperatureInside: temperatureInside,
-        lastCommand: smsConfig.commands.status,
-        lastCommandSuccess: false,
-      });
+      console.error('Error refreshing status:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   return {
-    isHeatingOn,
-    temperatureInside: temperatureInside,
-    lastUpdatedInside: lastUpdatedInside,
-    temperatureOutside: temperatureOutside,
-    lastUpdatedTemperatureOutside: lastUpdatedTemperatureOutside,
+    sensors,
     isLoading,
     handleToggle,
-    handleRefresh,
+    handleRefresh
   };
 };

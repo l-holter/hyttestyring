@@ -1,12 +1,20 @@
-export const sendSMS = async (command: string, phoneNumber: string) => {
-  // In a real implementation, this would integrate with your SMS service
-  // For demo purposes, we'll just log the command
-  console.log(`Sending command ${command} to ${phoneNumber}`);
-  
-  // Simulate API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ success: true });
-    }, 1000);
-  });
+export const sendSMS = async (command: string): Promise<any> => {
+  try {
+    const response = await fetch('http://localhost:3037', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ command }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('SMS API error:', error);
+    throw error;
+  }
 };
