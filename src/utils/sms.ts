@@ -1,9 +1,9 @@
-export const sendSMS = async (command: string): Promise<unknown> => {
+export const sendSMS = async (command: string): Promise<any> => {
   try {
-    const response = await fetch('http://localhost:3037', {
+    const response = await fetch('https://hyttestyring-helper-api.holter.io', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ command }),
     });

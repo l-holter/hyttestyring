@@ -21,7 +21,7 @@ export const StatusIndicator: React.FC<Props> = ({ isHeatingOn, lastUpdated }) =
       </div>
       {lastUpdated && (
         <span className="text-sm text-gray-500">
-          Oppdatert: {lastUpdated.toLocaleTimeString()}
+          Oppdatert: {lastUpdated.toLocaleString()}
         </span>
       )}
     </div>

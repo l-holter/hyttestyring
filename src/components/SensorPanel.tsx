@@ -42,7 +42,7 @@ export const SensorPanel: React.FC<SensorPanelProps> = ({
         </div>
         {lastUpdated && (
           <div className="text-sm text-gray-500 text-right mt-4">
-            Oppdatert: {lastUpdated.toLocaleTimeString()}
+            Oppdatert: {lastUpdated.toLocaleString()}
           </div>
         )}
       </div>

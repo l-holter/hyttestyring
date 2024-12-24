@@ -23,7 +23,7 @@ export const TemperatureDisplay: React.FC<Props> = ({ temperature, lastUpdated, 
       
       {lastUpdated && (
         <p className="text-sm text-gray-500 text-center">
-          Sist oppdatert: {lastUpdated.toLocaleTimeString()}
+          Oppdatert: {lastUpdated.toLocaleString()}
         </p>
       )}
     </div>

@@ -1,23 +1,28 @@
-# Use the official Node.js image as the base image
-FROM node:20
+# Stage 1: Build Stage
+FROM node:20-alpine AS build
 
-# Set the working directory within the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to the container
+# Install all dependencies, including devDependencies
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the application files to the container
+# Copy source code and build the app
 COPY . .
-
-# Build the Next.js app
 RUN npm run build
 
-# Expose the port your app will run on
-EXPOSE 3036
+# Stage 2: Production Stage
+FROM node:20-alpine
 
-# Command to run your application
-CMD ["npm", "start"]
+WORKDIR /usr/src/app
+
+# Install only production dependencies
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# Copy built files from the build stage
+COPY --from=build /usr/src/app/dist ./dist
+
+# Expose port and start the app
+EXPOSE 4173
+CMD ["npm", "run", "preview"]
