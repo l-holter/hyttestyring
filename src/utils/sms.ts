@@ -1,15 +1,22 @@
-export const sendSMS = async (command: string): Promise<any> => {
-  try {
-    const response = await fetch('https://hyttestyring-helper-api.holter.io', {
+import { smsConfig } from '../config/sms';
+import Client from "android-sms-gateway";
+
+export const sendSMS = async (message: string): Promise<any> => {
+  try {    
+    const response = await fetch(`https://hyttestyring-sms-forwarder.holter.io/message`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${smsConfig.authToken}`
       },
-      body: JSON.stringify({ command }),
+      body: JSON.stringify({
+        message
+      }),
     });
+    console.log(response)
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
+      throw new Error(`SMS API error: ${response.status} ${response.statusText}`);
     }
 
     return await response.json();

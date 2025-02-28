@@ -1,5 +1,7 @@
 export const smsConfig = {
   phoneNumber: import.meta.env.VITE_CONTROLLER_PHONE_NUMBER,
+  phoneIp: import.meta.env.VITE_CONTROLLER_PHONE_IP_ADDRESS,
+  authToken: import.meta.env.VITE_AUTH_TOKEN,
   commands: {
     turnOn: '#01#',
     turnOff: '#02#',
