@@ -1,5 +1,4 @@
 import { smsConfig } from '../config/sms';
-import Client from "android-sms-gateway";
 
 export const sendSMS = async (message: string): Promise<any> => {
   try {    

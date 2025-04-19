@@ -45,9 +45,10 @@ export const ControlPanel: React.FC<Props> = ({ turnOff, turnOn, turnOnTemperatu
           <button
               onClick={onRefresh}
               disabled={isLoading}
-              className="w-20 py-3 px-6 rounded-lg flex items-center justify-center self-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 transition-colors"
+              className="w-full py-3 px-6 rounded-lg flex items-center justify-center gap-2 self-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}/>
+            Status
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useTimeSince } from "../utils/formatTime";
 
 interface Props {
   isHeatingOn: boolean;
@@ -21,7 +22,7 @@ export const StatusIndicator: React.FC<Props> = ({ isHeatingOn, lastUpdated }) =
       </div>
       {lastUpdated && (
         <span className="text-sm text-gray-500">
-          Oppdatert: {lastUpdated.toLocaleString()}
+          Oppdatert: {useTimeSince(lastUpdated)}
         </span>
       )}
     </div>

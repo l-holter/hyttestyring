@@ -7,4 +7,11 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  root: process.cwd(),
+  build: {
+    outDir: 'dist',
+  },
+  server: {
+    allowedHosts: ['hyttestyring.holter.io'],
+  }
 });

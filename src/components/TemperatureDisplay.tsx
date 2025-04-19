@@ -1,5 +1,6 @@
 import React from 'react';
 import { Thermometer } from 'lucide-react';
+import { useTimeSince } from "../utils/formatTime";
 
 interface Props {
   temperature: number | null;
@@ -23,7 +24,7 @@ export const TemperatureDisplay: React.FC<Props> = ({ temperature, lastUpdated, 
       
       {lastUpdated && (
         <p className="text-sm text-gray-500 text-center">
-          Oppdatert: {lastUpdated.toLocaleString()}
+          Oppdatert: {useTimeSince(lastUpdated)}
         </p>
       )}
     </div>

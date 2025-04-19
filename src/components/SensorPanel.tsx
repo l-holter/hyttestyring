@@ -1,3 +1,5 @@
+import { useTimeSince } from "../utils/formatTime";
+
 interface SensorPanelProps {
   sensorId: string;
   temperature: number | null;
@@ -42,7 +44,7 @@ export const SensorPanel: React.FC<SensorPanelProps> = ({
         </div>
         {lastUpdated && (
           <div className="text-sm text-gray-500 text-right mt-4">
-            Oppdatert: {lastUpdated.toLocaleString()}
+            Oppdatert: {useTimeSince(lastUpdated)}
           </div>
         )}
       </div>
