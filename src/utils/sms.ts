@@ -1,6 +1,6 @@
 import { smsConfig } from '../config/sms';
 
-export const sendSMS = async (message: string): Promise<any> => {
+export const sendSms = async (message: string): Promise<any> => {
   try {    
     const response = await fetch(`https://hyttestyring-sms-forwarder.holter.io/message`, {
       method: 'POST',

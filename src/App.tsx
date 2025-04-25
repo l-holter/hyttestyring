@@ -9,6 +9,7 @@ import { StatusIndicator } from './components/StatusIndicator';
 import { TemperatureDisplay } from './components/TemperatureDisplay';
 import { SensorPanel } from './components/SensorPanel';
 import Login from './components/Login';
+import { MessageHistory } from "./components/MessageHistory";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -63,7 +64,7 @@ function App() {
                 onClick={() => pb.authStore.clear()}
                 className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
             >
-              Sign Out
+              Logg ut
             </button>
           </div>
 
@@ -71,6 +72,14 @@ function App() {
             <StatusIndicator
                 isHeatingOn={sensors.main.isHeatingOn}
                 lastUpdated={sensors.main.lastUpdated}
+            />
+
+            <ControlPanel
+                turnOff={handleTurnOff}
+                turnOn={handleTurnOn}
+                turnOnTemperatureControl={handleTemperatureControl}
+                onRefresh={handleRefresh}
+                isLoading={isLoading}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -92,13 +101,7 @@ function App() {
                 locationText='Temperatur ute (met.no)'
             />
 
-            <ControlPanel
-                turnOff={handleTurnOff}
-                turnOn={handleTurnOn}
-                turnOnTemperatureControl={handleTemperatureControl}
-                onRefresh={handleRefresh}
-                isLoading={isLoading}
-            />
+            <MessageHistory />
           </div>
         </div>
       </div>

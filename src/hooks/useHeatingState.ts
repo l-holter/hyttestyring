@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { sendSMS } from '../utils/sms';
+import { sendSms } from '../utils/sms';
 import { smsConfig } from '../config/sms';
-import { pb } from "../lib/pocketbase.ts";
+import { pb, getCurrentUserId } from "../lib/pocketbase.ts";
 
 interface HeatingState {
   id: string;
@@ -91,10 +91,36 @@ export const useHeatingState = () => {
     };
   }, []);
 
+  const saveSmsCommand = async (rawMessage: string) => {
+    try {
+      const userId = getCurrentUserId();
+      if (!userId) {
+        console.warn('No user logged in, SMS command will not be logged');
+        return;
+      }
+
+      if (!pb.authStore.isValid) {
+        console.error('Authentication is not valid, cannot log SMS command');
+        return;
+      }
+
+      const data = {
+        raw_message: rawMessage,
+        user: userId,
+      };
+
+      await pb.collection('sent_messages').create(data);
+      console.log('SMS command logged:', rawMessage);
+    } catch (error) {
+      console.error('Error logging SMS command:', error);
+    }
+  };
+
   const handleTurnOn = async () => {
     setIsLoading(true);
     try {
-      await sendSMS(smsConfig.commands.turnOn);
+      await sendSms(smsConfig.commands.turnOn);
+      await saveSmsCommand(smsConfig.commands.turnOn);
     } catch (error) {
       console.error('Error turning heating on:', error);
     } finally {
@@ -105,7 +131,8 @@ export const useHeatingState = () => {
   const handleTurnOff = async () => {
     setIsLoading(true);
     try {
-      await sendSMS(smsConfig.commands.turnOff);
+      await sendSms(smsConfig.commands.turnOff);
+      await saveSmsCommand(smsConfig.commands.turnOff);
     } catch (error) {
       console.error('Error turning heating off:', error);
     } finally {
@@ -118,13 +145,17 @@ export const useHeatingState = () => {
   const handleTemperatureControl = async () => {
     setIsLoading(true);
     try {
-      await sendSMS(smsConfig.commands.temperatureControlStue);
+      await sendSms(smsConfig.commands.temperatureControlStue);
+      await saveSmsCommand(smsConfig.commands.temperatureControlStue);
       await delay(5000);
-      await sendSMS(smsConfig.commands.temperatureControlStue1);
+      await sendSms(smsConfig.commands.temperatureControlStue1);
+      await saveSmsCommand(smsConfig.commands.temperatureControlStue1);
       await delay(5000);
-      await sendSMS(smsConfig.commands.temperatureControlStue2);
+      await sendSms(smsConfig.commands.temperatureControlStue2);
+      await saveSmsCommand(smsConfig.commands.temperatureControlStue2);
       await delay(5000);
-      await sendSMS(smsConfig.commands.temperatureControlSov);
+      await sendSms(smsConfig.commands.temperatureControlSov);
+      await saveSmsCommand(smsConfig.commands.temperatureControlSov);
     } catch (error) {
       console.error('Error turning heating off:', error);
     } finally {
@@ -135,7 +166,8 @@ export const useHeatingState = () => {
   const handleRefresh = async () => {
     setIsLoading(true);
     try {
-      await sendSMS(smsConfig.commands.status);
+      await saveSmsCommand(smsConfig.commands.status);
+      await sendSms(smsConfig.commands.status);
     } catch (error) {
       console.error('Error refreshing status:', error);
     } finally {
